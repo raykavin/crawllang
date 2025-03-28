@@ -1,10 +1,10 @@
 package main
 
 import (
-	"crawlang/crawllang"
 	"fmt"
 	"os"
 
+	"github.com/raykavin/crawllang/crawllang"
 	"github.com/spf13/cobra"
 )
 

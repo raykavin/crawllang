@@ -1,4 +1,4 @@
-module crawlang
+module github.com/raykavin/crawllang
 
 go 1.23.6
 

@@ -13,7 +13,7 @@ CrawlLang is a lightweight interpreted language designed for web scraping. It pr
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/crawllang.git
+   git clone https://github.com/raykavin/crawllang.git
    cd crawllang
    go build -o crawllang 
    ```

@@ -10,15 +10,6 @@ const (
 	OP_HALT
 )
 
-// var opcodeNames = map[int]string{
-// 	OP_NAVIGATE:   "NAVIGATE",
-// 	OP_CLICK:      "CLICK",
-// 	OP_STORE_VAR:  "STORE_VAR",
-// 	OP_LOAD_VAR:   "LOAD_VAR",
-// 	OP_PUSH_CONST: "PUSH_CONST",
-// 	OP_HALT:       "HALT",
-// }
-
 const (
 	TOKEN_EOF = iota
 	TOKEN_ILLEGAL
@@ -44,4 +35,17 @@ const (
 	// Keywords
 	TOKEN_VAR
 	TOKEN_FUNCTION
+)
+
+const (
+	NAVIGATE_FUNC string = "NAVIGATE"
+	CLICK_FUNC    string = "CLICK"
+
+	LPAREN     byte = '('
+	RPAREN     byte = ')'
+	LBRACE     byte = '{'
+	RBRACE     byte = '}'
+	SEMICOLON  byte = ';'
+	ASSIGNMENT byte = '='
+	STRING     byte = '"'
 )

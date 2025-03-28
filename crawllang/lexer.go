@@ -28,44 +28,68 @@ func (l *Lexer) readChar() {
 
 // Reads the next token
 func (l *Lexer) nextToken() Token {
-	var tok Token
-
 	l.skipWhitespace()
 
-	switch l.ch {
-	case '(':
-		tok = Token{Type: TOKEN_LPAREN, Literal: string(l.ch)}
-	case ')':
-		tok = Token{Type: TOKEN_RPAREN, Literal: string(l.ch)}
-	case ';':
-		tok = Token{Type: TOKEN_SEMICOLON, Literal: string(l.ch)}
-	case '=':
-		tok = Token{Type: TOKEN_ASSIGN, Literal: string(l.ch)}
-	case '"':
-		tok.Type = TOKEN_STRING
-		tok.Literal = l.readString()
-		return tok
-	case 0:
-		tok = Token{Type: TOKEN_EOF}
-	default:
-		if isLetter(l.ch) {
-			tok.Literal = l.readIdentifier()
-			switch tok.Literal {
-			case "NAVIGATE":
-				tok.Type = TOKEN_NAVIGATE
-			case "CLICK":
-				tok.Type = TOKEN_CLICK
-			default:
-				tok.Type = TOKEN_VAR
-			}
+	// Map of known single-character token handlers
+	charHandlers := map[byte]func() Token{
+		LPAREN: func() Token {
+			tok := Token{Type: TOKEN_LPAREN, Literal: string(l.ch)}
+			l.readChar()
 			return tok
-		} else if isDigit(l.ch) {
-			tok.Literal = l.readNumber()
-			tok.Type = TOKEN_NUMBER
+		},
+		RPAREN: func() Token {
+			tok := Token{Type: TOKEN_RPAREN, Literal: string(l.ch)}
+			l.readChar()
 			return tok
-		}
+		},
+		SEMICOLON: func() Token {
+			tok := Token{Type: TOKEN_SEMICOLON, Literal: string(l.ch)}
+			l.readChar()
+			return tok
+		},
+		ASSIGNMENT: func() Token {
+			tok := Token{Type: TOKEN_ASSIGN, Literal: string(l.ch)}
+			l.readChar()
+			return tok
+		},
+		STRING: func() Token {
+			lit := l.readString()
+			return Token{Type: TOKEN_STRING, Literal: lit}
+		},
 	}
 
+	// Check if we have a handler for the current character
+	if handler, exists := charHandlers[l.ch]; exists {
+		return handler()
+	}
+
+	// Handle special cases
+	switch {
+	case l.ch == 0:
+		tok := Token{Type: TOKEN_EOF}
+		l.readChar()
+		return tok
+
+	case isLetter(l.ch):
+		literal := l.readIdentifier()
+		tokType := TOKEN_VAR
+
+		switch literal {
+		case NAVIGATE_FUNC:
+			tokType = TOKEN_NAVIGATE
+		case CLICK_FUNC:
+			tokType = TOKEN_CLICK
+		}
+
+		return Token{Type: tokType, Literal: literal}
+
+	case isDigit(l.ch):
+		literal := l.readNumber()
+		return Token{Type: TOKEN_NUMBER, Literal: literal}
+	}
+
+	// Handle unknown characters
+	tok := Token{Type: TOKEN_ILLEGAL, Literal: string(l.ch)}
 	l.readChar()
 	return tok
 }
@@ -97,12 +121,16 @@ func (l *Lexer) readNumber() string {
 
 // Reads a string literal
 func (l *Lexer) readString() string {
-	l.readChar() // Skip opening quote
+	// Skip opening quote
+	l.readChar()
+
 	start := l.position
 	for l.ch != '"' && l.ch != 0 {
 		l.readChar()
 	}
 	end := l.position
-	l.readChar() // Skip closing quote
+
+	// Skip closing quote
+	l.readChar()
 	return l.input[start:end]
 }
